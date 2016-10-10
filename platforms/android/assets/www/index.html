@@ -18,8 +18,9 @@
     under the License.
 -->
 <html>
-    <head>
-        <!--
+
+<head>
+    <!--
         Customize this policy to fit your own app's needs. For more guidance, see:
             https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
         Some notes:
@@ -28,22 +29,278 @@
             * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
                 * Enable inline JS: add 'unsafe-inline' to default-src
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
-        <title>Hello World</title>
-    </head>
-    <body>
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.firebase.com https://*.firebaseio.com;  media-src * 'self' data: gap: blob: ; img-src * 'self' data: gap: ;">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="js/jquerymobile1.4.5/jquery.mobile-1.4.5.css" />
+    <link rel="stylesheet" type="text/css" href="iconfont/material-icons.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/materialize.min.css" media="screen,projection" />
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <title>Hello World</title>
+</head>
+
+<body>
+  <div class="custom-spinner" hidden>
+                <div class="preloader-wrapper big active ">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <div data-role="page" id="login-page">
+        <div class="row">
+            <form class="col s12" id="login-form">
+                <div class="row">
+                    <div class="input-field col s12 center">
+                        <img src="img/logo.png" alt="" class="circle responsive-img valign profile-image-login" width="100px">
+                        <p class="center login-form-text">NOTIFICA APP LOGIN</p>
+                    </div>
+                    </dvi>
+                    <div class="row margin">
+                        <div class="input-field col s12" data-role="none">
+                            <i class="material-icons prefix">perm_identity</i>
+                            <label for="email-input-login" data-role="none">Email</label>
+                            <input id="email-input-login" name="email" type="email" data-role="none" data-error=".error-email">
+                            <div class="error-email error"></div>
+                        </div>
+                    </div>
+                    <div class="row margin">
+                        <div class="input-field col s12" data-role="none">
+                            <i class="material-icons prefix">lock_outline</i>
+                            <label for="pass-input-login" data-role="none">Password</label>
+                            <input id="pass-input-login" name="password" type="password" data-role="none" data-error=".error-pass">
+                            <div class="error-pass error"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m12 l12  login-text">
+                            <input type="checkbox" id="remember-me" data-role="none" />
+                            <label for="remember-me">Remember me</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <a id="login-button" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">Login</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s6 m6 l6">
+                            <p class="margin medium-small">
+                                <a href="#register-page" data-transition="flip" data-role="none">Register Now!</a></p>
+                        </div>
+                        <div class="input-field col s6 m6 l6">
+                            <p class="margin right-align medium-small"><a href="page-forgot-password.html" data-role="none">Forgot password ?</a></p>
+                        </div>
+                    </div>
+            </form>
+
             </div>
         </div>
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-    </body>
+    </div>
+    <div data-role="page" id="register-page">
+        <div class="row">
+            <form class="col s12" id="register-form">
+                <div class="row">
+                    <div class="input-field col s12 center">
+                        <p class="center login-form-text">Register</p>
+                    </div>
+                    </dvi>
+                    <div class="row margin">
+                        <div class="input-field col s12" data-role="none">
+                            <i class="material-icons prefix">perm_identity</i>
+                            <label for="email-input" data-role="none">Email</label>
+                            <input id="email-input" name="email" type="email" data-role="none" data-error=".error-email">
+                            <div class="error-email error"></div>
+                        </div>
+                    </div>
+                    <div class="row margin">
+                        <div class="input-field col s12" data-role="none">
+                            <i class="material-icons prefix">lock_outline</i>
+                            <label for="pass-input" data-role="none">Password</label>
+                            <input id="pass-input" name="password" type="password" data-role="none" data-error=".error-pass">
+                            <div class="error-pass error"></div>
+                        </div>
+                    </div>
+                    <div class="row margin">
+                        <div class="input-field col s12" data-role="none">
+                            <i class="material-icons prefix">lock_outline</i>
+                            <label for="confpass-input" data-role="none">Confirm password</label>
+                            <input id="confpass-input" name="confpassword" type="password" data-role="none" data-error=".error-confpass">
+                            <div class="error-confpass error"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <a id="register-button" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">Register</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s6 m6 l6">
+                            <p class="margin medium-small">
+                                <a href="#login-page" data-transition="flip" data-role="none">Back to login!</a></p>
+                        </div>
+                    </div>
+            </form>
+
+            </div>
+        </div>
+    </div>
+    <div data-role="page" id="home-page">
+        <nav>
+            <div class="nav-wrapper light-blue darken-3">
+                <a href="#" class="brand-logo center">Notifica</a>
+                <ul id="slide-out" class="side-nav">
+                    <li>
+                        <div class="userView">
+                            <img class="background" src="img/back-user.jpg">
+                            <a href="#!user"><img class="circle" src="img/user.png"></a>
+                            <a href="#!name"><span class="white-text user-name">Benvenuto</span></a>
+                            <a href="#!email"><span class="white-text user-email">prova@gmail.com</span></a>
+                        </div>
+                    </li>
+                    <li><a href="#send-message" data-transition="flip">Invia notifica</a></li>
+                    <li><a href="#profile-page">Profilo</a></li>
+                </ul>
+                <a href="#" data-activates="slide-out" id="side-nav-button" class="button-collapse show-on-large"><i class="material-icons">menu</i></a>
+            </div>
+        </nav>
+        <div data-role="main" class="ui-content">
+            <!--<div class="app">
+                <h1>Apache Cordova</h1>
+                <div id="deviceready" class="blink">
+                    <p class="event listening">Connecting to Device</p>
+                    <p class="event received">Device is Ready</p>
+                </div>
+            </div>-->
+            <div class="row">
+            <ul id="list-messages" class="collapsible" data-collapsible="expandable" data-role="none">
+              <li data-role="none">
+                <div class="collapsible-header"><i class="material-icons">message</i>First</div>
+                <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+              </li>
+            </ul>
+            </div>
+            <div class="fixed-action-btn" style="bottom: 24px; right: 24px;">
+                <a href="#send-message"  data-transition="flip" class="btn-floating btn-large light-blue darken-3">
+                    <i class="large material-icons">mode_edit</i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div data-role="page" id="send-message">
+      <nav>
+          <div class="nav-wrapper light-blue darken-3">
+              <a href="#" class="brand-logo center">Notifica</a>
+              <a href="#home-page" class="button-collapse show-on-large" data-transition="flip"><i class="material-icons">undo</i></a>
+          </div>
+      </nav>
+        <div data-role="main" class="ui-content">
+            <div class="row">
+              <div class="col s12">
+                 <h5 class="center-align">Per mandare una totifica inserisci l'email di un utente
+                   o seleziona un gruppo di utenti a cui inviare.</h5>
+               </div>
+                <div class="input-field col s6" data-role="none">
+                  <select id="groupsname" class="browser-default groupsname" data-role="none">
+                    <option data-role="none" value="" disabled selected>Scegli un gruppo</option>
+                  </select>
+                </div>
+                <!--<div class="input-field col s6" data-role="none">
+                  <input type="text" name="city" list="groupsname" data-role="none">
+                  <datalist id="groupsname">
+                  </datalist>
+                </div>-->
+                <div class="input-field col s6" data-role="none">
+                    <label for="user-to-send" data-role="none">Email utente</label>
+                    <input id="user-to-send" name="user" type="email" data-role="none" data-error=".error-pass">
+                    <div class="error-pass error"></div>
+                </div>
+                <div class="input-field col s12">
+                  <textarea id="message" class="materialize-textarea"></textarea>
+                  <label for="message">Messagio da inviare</label>
+                </div>
+            </div>
+            <div class="row margin">
+                <div class="input-field col s12">
+                    <a id="send-button" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">
+                      <i class="material-icons left">reply_all</i>Invia</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div data-role="page" id="profile-page">
+      <nav>
+          <div class="nav-wrapper light-blue darken-3">
+              <a href="#" class="brand-logo center">Notifica</a>
+              <a href="#home-page" class="button-collapse show-on-large" data-transition="flip"><i class="material-icons">undo</i></a>
+          </div>
+      </nav>
+        <div data-role="main" class="ui-content">
+            <div class="row">
+              <div class="col s12">
+                 <h4 class="center-align">Profilo</h4>
+               </div>
+               <div class="col s12">
+                 <i class="material-icons left">email</i><b>Email: </b><span class="user-email">prova@gmail.com</span>
+               </div>
+               <div class="col s12">
+                 <i class="material-icons left">group</i><b>Gruppi: </b>
+                 <span id="groups-list"></span>
+               </div>
+               <div class="row margin"></div>
+               <div class="col s12">
+                  <h5 class="center-align">Gestione gruppi</h5>
+                </div>
+                <div class="input-field col s6" data-role="none">
+                  <div class="col s12">
+                    <b>Scegli un gruppo a cui aggiungerti</b>
+                  </div>
+                  <select id="add-group-user" class="browser-default groupsname" data-role="none">
+                    <option data-role="none" value="" disabled selected>Scegli un gruppo</option>
+                  </select>
+                  <div class="input-field col s12">
+                      <a id="addGroup" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">Aggiungi</a>
+                  </div>
+                </div>
+                <div class="input-field col s6" data-role="none">
+                  <div class="col s12">
+                    <b>Rimuovi un gruppo dai tuoi preferiti</b>
+                  </div>
+                  <select id="usergroups" class="browser-default" data-role="none">
+                    <option data-role="none" value="" disabled selected>Scegli un gruppo</option>
+                  </select>
+                  <div class="input-field col s12">
+                      <a id="deleteGroup" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">Elimina</a>
+                  </div>
+                </div>
+                <div class="row margin"></div>
+                <div class="input-field col s12" data-role="none">
+                    <i class="material-icons prefix">group_add</i>
+                    <label for="new-group" data-role="none">Crea un gruppo</label>
+                    <input id="new-group" name="email" type="text" data-role="none" >
+                    <div class="input-field col s12">
+                        <a id="createGroup" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">Crea</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/assets/jquery2.1.4.js"></script>
+    <script type="text/javascript" src="js/jquerymobile1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="js/assets/materialize.min.js"></script>
+    <script type="text/javascript" src="js/assets/jquery-validate.js"></script>
+    <script type="text/javascript" src="js/assets/firebase.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/validations.js"></script>
+</body>
+
 </html>

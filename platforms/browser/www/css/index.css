@@ -113,3 +113,52 @@ h1 {
     animation:fade 3000ms infinite;
     -webkit-animation:fade 3000ms infinite;
 }
+
+.input-field div.error{
+    position: relative;
+    top: -0.6rem;
+    left: 1.4rem;
+    font-size: 0.8rem;
+    color:#b71c1c;
+    -webkit-transform: translateY(0%);
+    -ms-transform: translateY(0%);
+    -o-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+  .input-field label.active{
+     width:100%;
+ }
+ .left-alert input[type=text] + label:after,
+ .left-alert input[type=password] + label:after,
+ .left-alert input[type=email] + label:after,
+ .left-alert input[type=url] + label:after,
+ .left-alert input[type=time] + label:after,
+ .left-alert input[type=date] + label:after,
+ .left-alert input[type=datetime-local] + label:after,
+ .left-alert input[type=tel] + label:after,
+ .left-alert input[type=number] + label:after,
+ .left-alert input[type=search] + label:after,
+ .left-alert textarea.materialize-textarea + label:after{
+     left:0px;
+ }
+ .right-alert input[type=text] + label:after,
+ .right-alert input[type=password] + label:after,
+ .right-alert input[type=email] + label:after,
+ .right-alert input[type=url] + label:after,
+ .right-alert input[type=time] + label:after,
+ .right-alert input[type=date] + label:after,
+ .right-alert input[type=datetime-local] + label:after,
+ .right-alert input[type=tel] + label:after,
+ .right-alert input[type=number] + label:after,
+ .right-alert input[type=search] + label:after,
+ .right-alert textarea.materialize-textarea + label:after{
+     right:70px;
+ }
+.custom-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /*z-index: -10;*/
+    /* bring your own prefixes */
+    transform: translate(-50%, -50%);
+}
