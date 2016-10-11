@@ -40,7 +40,7 @@
 </head>
 
 <body>
-  <div class="custom-spinner" hidden>
+  <div class="custom-spinner" >
                 <div class="preloader-wrapper big active ">
                     <div class="spinner-layer spinner-blue-only">
                         <div class="circle-clipper left">
@@ -82,7 +82,7 @@
                     </div>
                     <div class="row">
                         <div class="input-field col s12 m12 l12  login-text">
-                            <input type="checkbox" id="remember-me" data-role="none" />
+                            <input type="checkbox" id="remember-me" data-role="none" checked />
                             <label for="remember-me">Remember me</label>
                         </div>
                     </div>
@@ -157,6 +157,7 @@
         <nav>
             <div class="nav-wrapper light-blue darken-3">
                 <a href="#" class="brand-logo center">Notifica</a>
+                <a onClick="reloadMessages()" class="button-collapse show-on-large right" data-role="none"><i class="material-icons">cached</i></a>
                 <ul id="slide-out" class="side-nav">
                     <li>
                         <div class="userView">
@@ -166,8 +167,12 @@
                             <a href="#!email"><span class="white-text user-email">prova@gmail.com</span></a>
                         </div>
                     </li>
-                    <li><a href="#send-message" data-transition="flip">Invia notifica</a></li>
-                    <li><a href="#profile-page">Profilo</a></li>
+                    <li><div class="row" style="margin:0px;"><i class="material-icons col s3" style="color:black;">chat_bubble</i><a class="col s9" href="#send-message" data-transition="flip">Invia notifica</a></div></li>
+                    <li><div class="row" style="margin:0px;"><i class="material-icons col s3" style="color:black;">message</i><a class="col s9" id="show-messages-list" >Notifiche</a></div></li>
+                    <li><div class="divider"></div></li>
+                    <li><div class="row" style="margin:0px;"><i class="material-icons col s3" style="color:black;">assignment_ind</i><a class="col s9" href="#profile-page" data-transition="flip">Profilo</a></div></li>
+                    <li><div class="row" style="margin:0px;"><i class="material-icons col s3" style="color:black;">view_list</i><a class="col s9" id="show-personal-list">Notifiche inviate</a></div></li>
+                    <li><div class="row" style="margin:0px;"><i class="material-icons col s3" style="color:black;">exit_to_app</i><a class="col s9" id="logout-button" href="#">Log out</a></div></li>
                 </ul>
                 <a href="#" data-activates="slide-out" id="side-nav-button" class="button-collapse show-on-large"><i class="material-icons">menu</i></a>
             </div>
@@ -187,6 +192,8 @@
                 <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
               </li>
             </ul>
+            <ul id="list-personal-messages" class="collapsible" data-collapsible="expandable" data-role="none">
+            </ul>
             </div>
             <div class="fixed-action-btn" style="bottom: 24px; right: 24px;">
                 <a href="#send-message"  data-transition="flip" class="btn-floating btn-large light-blue darken-3">
@@ -205,7 +212,7 @@
         <div data-role="main" class="ui-content">
             <div class="row">
               <div class="col s12">
-                 <h5 class="center-align">Per mandare una totifica inserisci l'email di un utente
+                 <h5 class="center-align">Per mandare una notifica inserisci l'email di un utente
                    o seleziona un gruppo di utenti a cui inviare.</h5>
                </div>
                 <div class="input-field col s6" data-role="none">
@@ -231,7 +238,7 @@
             <div class="row margin">
                 <div class="input-field col s12">
                     <a id="send-button" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">
-                      <i class="material-icons left">reply_all</i>Invia</a>
+                      <i class="material-icons left">send</i>Invia</a>
                 </div>
             </div>
         </div>
@@ -278,7 +285,7 @@
                     <option data-role="none" value="" disabled selected>Scegli un gruppo</option>
                   </select>
                   <div class="input-field col s12">
-                      <a id="deleteGroup" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">Elimina</a>
+                      <a id="deleteGroup" class="btn waves-effect waves-light light-blue darken-3 col s12" data-role="none">Rimuovi</a>
                   </div>
                 </div>
                 <div class="row margin"></div>

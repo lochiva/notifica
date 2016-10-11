@@ -24,7 +24,7 @@ body {
     -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
     -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
-    background-color:#E4E4E4;
+  /*  background-color:#E4E4E4;
     background-image:linear-gradient(top, #A7A7A7 0%, #E4E4E4 51%);
     background-image:-webkit-linear-gradient(top, #A7A7A7 0%, #E4E4E4 51%);
     background-image:-ms-linear-gradient(top, #A7A7A7 0%, #E4E4E4 51%);
@@ -34,14 +34,14 @@ body {
         left bottom,
         color-stop(0, #A7A7A7),
         color-stop(0.51, #E4E4E4)
-    );
+    );*/
     background-attachment:fixed;
-    font-family:'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
-    font-size:12px;
+    /*font-family:'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+    font-size:12px;*/
     height:100%;
     margin:0px;
     padding:0px;
-    text-transform:uppercase;
+    /*text-transform:uppercase;*/
     width:100%;
 }
 
@@ -102,14 +102,70 @@ h1 {
     50% { opacity: 0.4; }
     to { opacity: 1.0; }
 }
- 
+
 @-webkit-keyframes fade {
     from { opacity: 1.0; }
     50% { opacity: 0.4; }
     to { opacity: 1.0; }
 }
- 
-.blink {
-    animation:fade 3000ms infinite;
-    -webkit-animation:fade 3000ms infinite;
+@-webkit-keyframes blinker {
+  from { color:black;}
+  to {background-color:#c9cfd8;}
+}
+.blink i{
+	text-decoration: blink;
+	-webkit-animation-name: blinker;
+	-webkit-animation-duration: 0.6s;
+	-webkit-animation-iteration-count:infinite;
+	-webkit-animation-timing-function:ease-in-out;
+	-webkit-animation-direction: alternate;
+}
+
+.input-field div.error{
+    position: relative;
+    top: -0.6rem;
+    left: 1.4rem;
+    font-size: 0.8rem;
+    color:#b71c1c;
+    -webkit-transform: translateY(0%);
+    -ms-transform: translateY(0%);
+    -o-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+  .input-field label.active{
+     width:100%;
+ }
+ .left-alert input[type=text] + label:after,
+ .left-alert input[type=password] + label:after,
+ .left-alert input[type=email] + label:after,
+ .left-alert input[type=url] + label:after,
+ .left-alert input[type=time] + label:after,
+ .left-alert input[type=date] + label:after,
+ .left-alert input[type=datetime-local] + label:after,
+ .left-alert input[type=tel] + label:after,
+ .left-alert input[type=number] + label:after,
+ .left-alert input[type=search] + label:after,
+ .left-alert textarea.materialize-textarea + label:after{
+     left:0px;
+ }
+ .right-alert input[type=text] + label:after,
+ .right-alert input[type=password] + label:after,
+ .right-alert input[type=email] + label:after,
+ .right-alert input[type=url] + label:after,
+ .right-alert input[type=time] + label:after,
+ .right-alert input[type=date] + label:after,
+ .right-alert input[type=datetime-local] + label:after,
+ .right-alert input[type=tel] + label:after,
+ .right-alert input[type=number] + label:after,
+ .right-alert input[type=search] + label:after,
+ .right-alert textarea.materialize-textarea + label:after{
+     right:70px;
+ }
+.custom-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /*z-index: -10;*/
+    /* bring your own prefixes */
+    transform: translate(-50%, -50%);
 }

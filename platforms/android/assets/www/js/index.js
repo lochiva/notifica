@@ -34,6 +34,30 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
+        stopSpinner();
+        cordova.plugins.backgroundMode.enable();
+        cordova.plugins.backgroundMode.setDefaults({
+            title:  "Notifica",
+            text:   "L'applicazione è in ascolto.",
+            color: "123456",
+            silent: false
+        });
+        /*cordova.plugins.backgroundMode.configure({
+            silent: false
+        });*/
+
+        // 2) Now the app runs ins background but stays awake
+        cordova.plugins.backgroundMode.onactivate = function () {
+            app.inBackground = true;
+            /*setInterval(function () {
+                cordova.plugins.notification.badge.increase();
+            }, 1000);*/
+        };
+
+        // 3) App is back to foreground
+        cordova.plugins.backgroundMode.ondeactivate = function () {
+          app.inBackground = false;
+        };
     },
 
     user:{
@@ -43,6 +67,7 @@ var app = {
       },
     },
     messages: [],
+    inBackground: false,
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         /*var parentElement = document.getElementById(id);
@@ -72,36 +97,62 @@ $(document).ready(function() {
     };
   firebase.initializeApp(config);
   // Controllo se l'utente è loggato, e nel caso apro la home-page
-  var user = firebase.auth().currentUser;
-  if (user) {
-    readUsergroups();
-    $(":mobile-pagecontainer").pagecontainer("change", '#home-page', {
-            transition: "flip"
-        });
-  }
-  // Nel caso di logout riposto alla pagina di login e nel caso di login salvo i dati utente
+  // Nel caso di logout riposto alla pagina di login
   firebase.auth().onAuthStateChanged(function(user) {
     if (!user)  {
       $(":mobile-pagecontainer").pagecontainer("change", '#login-page', {
               transition: "flip"
           });
     }else{
-
+      startSpinner();
+      readUsergroups();
+      $(":mobile-pagecontainer").pagecontainer("change", '#home-page', {
+              transition: "flip"
+          });
+      $('.user-email').html(user.email);
+      stopSpinner();
     }
   });
+  // Caso di chiusura applicazione
+  window.onbeforeunload = function(e) {
+    if(!$("#remember-me").is(':checked')){
+      firebase.auth().signOut().then(function() {
+        // Sign-out successful.
+      }, function(error) {
+        // An error happened.
+      });
+    }
+  };
 
   $( document ).on( "swipeleft",function() {
-      startSpinner();
+
       $('#side-nav-button').sideNav('hide');
-      stopSpinner();
+
   });
 
   $( document ).on( "swiperight",function() {
+
+    var id = $(':mobile-pagecontainer').pagecontainer('getActivePage').attr('id');
+    if(id == 'home-page'){
+      $('#side-nav-button').sideNav('show');
+    }
+    
+  });
+  document.getElementById("show-personal-list").addEventListener("click", function(){
     startSpinner();
-    $('#side-nav-button').sideNav('show');
+    $('#list-messages').hide();
+    $('#list-personal-messages').show();
+    readPersonalMessages();
+    $('#side-nav-button').sideNav('hide');
     stopSpinner();
   });
-
+  document.getElementById("show-messages-list").addEventListener("click", function(){
+    startSpinner();
+    $('#list-personal-messages').hide();
+    $('#list-messages').show();
+    $('#side-nav-button').sideNav('hide');
+    stopSpinner();
+  });
   document.getElementById("register-button").addEventListener("click", function(){
     startSpinner();
     var email = $('#email-input').val();
@@ -132,19 +183,30 @@ $(document).ready(function() {
     }
     stopSpinner();
   });
+  document.getElementById("logout-button").addEventListener("click", function(){
+    startSpinner();
+      firebase.auth().signOut().then(function() {
+        firebase.database().goOffline();
+        stopSpinner();
+      }, function(error) {
+        Materialize.toast('Errore connessione: ' + error, 5000);
+        stopSpinner();
+      });
+  });
   document.getElementById("send-button").addEventListener("click", sendMessage);
   document.getElementById("addGroup").addEventListener("click", function(){
     startSpinner();
     var group = $('#add-group-user').val();
     if(group !== undefined && group !== null){
       firebase.database().ref('/user_details/'+app.user.key+'/groups').push(group).then(function(snapshot){
+        app.messages = [];
         readUsergroups();
 
         Materialize.toast('Gruppo aggiunto.', 3000,'rounded');
         stopSpinner();
       }).catch(function(error) {
 
-            Materialize.toast('Errore connessione: ' + error, 3000);
+            Materialize.toast('Errore connessione: ' + error, 5000);
             stopSpinner();
       });
     }
@@ -155,13 +217,14 @@ $(document).ready(function() {
       var key = $("#usergroups option:selected").attr('data-key');
       if(key !== undefined && key !== null){
         firebase.database().ref('/user_details/'+app.user.key+'/groups/'+key).remove().then(function(snapshot){
+          app.messages = [];
           readUsergroups();
 
           Materialize.toast('Gruppo elimninato.', 3000,'rounded');
           stopSpinner();
         }).catch(function(error) {
 
-              Materialize.toast('Errore connessione: ' + error, 3000);
+              Materialize.toast('Errore connessione: ' + error, 5000);
               stopSpinner();
         });
       }
@@ -173,20 +236,21 @@ $(document).ready(function() {
       if(group !== undefined && group !== null && group !== ''){
         firebase.database().ref('groups/'+group).set({ name: group }).then(function(snapshot){
           firebase.database().ref('/user_details/'+app.user.key+'/groups').push(group).then(function(snapshot){
+            app.messages = [];
             readUsergroups();
 
             $('#new-group').val('');
             Materialize.toast('Gruppo creato ed aggiunto.', 3000,'rounded');
             stopSpinner();
           }).catch(function(error) {
-                Materialize.toast('Errore connessione: ' + error, 3000);
+                Materialize.toast('Errore connessione: ' + error, 5000);
                 stopSpinner();
 
           });
           readGroups();
         }).catch(function(error) {
 
-              Materialize.toast('Errore connessione: ' + error, 3000);
+              Materialize.toast('Errore connessione: ' + error, 5000);
               stopSpinner();
 
         });
@@ -205,7 +269,9 @@ $(document).ready(function() {
             $('#message').val('');
             readGroups();
         }else if(id == 'home-page'){
-          listMessages();
+          $('#list-personal-messages').hide();
+          $('#list-messages').show();
+          //listMessages();
         }else if(id == 'profile-page'){
           readGroups();
         }
@@ -227,7 +293,7 @@ function register(email,pass){
                     stopSpinner();
                   }).catch(function(error) {
 
-                      Materialize.toast('Errore scrittura database: ' + error, 3000);
+                      Materialize.toast('Errore scrittura database: ' + error, 5000);
                       stopSpinner();
 
 
@@ -238,7 +304,7 @@ function register(email,pass){
     }, function(error) {
       var errorCode = error.code;
       var errorMessage = error.message;
-      Materialize.toast('Errore registrazione: '+errorMessage, 3000 );
+      Materialize.toast('Errore registrazione: '+errorMessage, 5000 );
     });
 
 }
@@ -248,13 +314,14 @@ function login(email,pass){
       Materialize.toast('Login avvenuto con successo.', 3000,'rounded' );
       $( ":mobile-pagecontainer" ).pagecontainer( "change", '#home-page', { transition: "fade" } );
       $('.user-email').html(email);
-      readUsergroups();
+
+      //readUsergroups();
       stopSpinner();
       return true;
     }, function(error) {
       var errorCode = error.code;
       var errorMessage = error.message;
-      Materialize.toast('Errore login: '+errorMessage, 3000 );
+      Materialize.toast('Errore login: '+errorMessage, 5000 );
       stopSpinner();
       return false;
     });
@@ -281,7 +348,7 @@ function readUsergroups(){
     }, 2000);
 
   }).catch(function(error) {
-        Materialize.toast('Errore connessione: ' + error, 3000);
+        Materialize.toast('Errore connessione: ' + error, 5000);
 
   });
 }
@@ -297,14 +364,14 @@ function readGroups(){
     }
 
   }).catch(function(error) {
-        Materialize.toast('Errore connessione: ' + error, 3000);
+        Materialize.toast('Errore connessione: ' + error, 5000);
 
   });
 }
 
 function sendMessage(){
   startSpinner();
-  if($('#user-to-send').val() != '' || $('#groupsname').val() != null){
+  if($('#user-to-send').val() !== '' || $('#groupsname').val() !== null){
     if($('#message').val().length > '5'){
       firebase.database().ref('messages').push({
           user: firebase.auth().currentUser.email,
@@ -313,12 +380,14 @@ function sendMessage(){
           timestamp: new Date().getTime(),
           text: $('#message').val()
         }).then(function(snapshot){
-
+          $('#user-to-send').val('');
+          $('#message').val('');
+          readGroups();
           Materialize.toast('Messaggio inviato con successo.', 3000,'rounded');
           stopSpinner();
       }).catch(function(error) {
 
-            Materialize.toast('Errore connessione: ' + error, 3000);
+            Materialize.toast('Errore connessione: ' + error, 5000);
             stopSpinner();
       });
     }else{
@@ -331,6 +400,43 @@ function sendMessage(){
     Materialize.toast('Devi inserire un utente o selezionare un gruppo.', 4000);
     stopSpinner();
   }
+
+}
+
+function readPersonalMessages(){
+  startSpinner();
+  var ref = firebase.database().ref('/messages/');
+
+  ref.orderByChild('user').equalTo(firebase.auth().currentUser.email).limitToLast(20).once('value', function(snapshot) {
+          $('#list-personal-messages').html('');
+          $.each(snapshot.val(), function(index, element) {
+            var data = (new Date(element.timestamp)).toISOString().substring(0, 19).replace('T', ' ');
+            var to = '';
+            if(element.group !== undefined && element.group !== ''){
+              to = ' <b>Group:</b> '+element.group;
+            }else{
+              to = ' <b>To:</b> '+element.to;
+            }
+            $('#list-personal-messages').prepend('<li id="'+index+'" data-role="none">'+
+              '<div class="collapsible-header"><i class="material-icons">email</i>'+
+              '<b>Data: </b>'+data+to+' <b>From: </b>'+element.user+
+              ' <button class="waves-effect waves-light btn blue-grey" onClick="deleteMessage(\''+index+'\')">Elimina</button></div>'+
+              '<div class="collapsible-body"><p>'+element.text+'</p></div>'+
+            '</li>');
+          });
+          stopSpinner();
+      },function(error) {
+        stopSpinner();
+        Materialize.toast('Errore connessione: ' + error, 5000);
+        console.error(error);
+      });
+}
+
+function reloadMessages(){
+  startSpinner();
+  app.messages = [];
+  readUsergroups();
+  stopSpinner();
 
 }
 
@@ -352,9 +458,13 @@ function readMessages(){
         to = ' <b>To:</b> '+notifica.to;
       }
       $('#list-messages').prepend('<li data-role="none">'+
-        '<div class="collapsible-header"><i class="material-icons">message</i><b>Data: </b>'+data+to+'</div>'+
+        '<div class="collapsible-header blink" onclick="removeBlink(this)"><i class="material-icons">message</i>'+
+        '<b>Data: </b>'+data+to+' <b>From: </b>'+notifica.user+'</div>'+
         '<div class="collapsible-body"><p>'+notifica.text+'</p></div>'+
       '</li>');
+      if(app.inBackground){
+          alertNotification(notifica.user);
+      }
 
 
   },function(error) {
@@ -378,9 +488,13 @@ function readMessages(){
             to = ' <b>To:</b> '+notifica.to;
           }
           $('#list-messages').prepend('<li data-role="none">'+
-            '<div class="collapsible-header"><i class="material-icons">message</i><b>Data: </b>'+data+to+'</div>'+
+            '<div class="collapsible-header blink" onclick="removeBlink(this)"><i class="material-icons" >message</i>'+
+            '<b>Data: </b>'+data+to+' <b>From: </b>'+notifica.user+'</div>'+
             '<div class="collapsible-body"><p>'+notifica.text+'</p></div>'+
           '</li>');
+          if(app.inBackground){
+            alertNotification(notifica.user);
+          }
 
         },function(error) {
           Materialize.toast('Errore connessione: ' + error, 5000);
@@ -408,12 +522,55 @@ function listMessages()
       to = ' <b>To:</b> '+element.to;
     }
     $('#list-messages').prepend('<li data-role="none">'+
-      '<div class="collapsible-header"><i class="material-icons">message</i><b>Data: </b>'+data+to+'</div>'+
+      '<div class="collapsible-header blink" onclick="removeBlink(this)"><i class="material-icons">message</i>'+
+      '<b>Data: </b>'+data+to+' <b>From: </b>'+element.user+'</div>'+
       '<div class="collapsible-body"><p>'+element.text+'</p></div>'+
     '</li>');
 
   });
 
+}
+
+function deleteMessage(key){
+  startSpinner();
+  firebase.database().ref('/messages/'+key).remove().then(function(snapshot){
+
+    $('#'+key).remove();
+    Materialize.toast('Messaggio elimninato.', 3000,'rounded');
+    stopSpinner();
+  }).catch(function(error) {
+
+        Materialize.toast('Errore connessione: ' + error, 5000);
+        stopSpinner();
+  });
+
+}
+
+function alertNotification(val)
+{
+    cordova.plugins.backgroundMode.configure({
+        title: 'Notifica ricevuta da '+val+', apri per visualizzare.',
+    });
+    var now = new Date().getTime(),
+        _4_sec_from_now = new Date(now + 4 * 1000);
+    cordova.plugins.notification.local.schedule({
+        id: now,
+        title: 'Notifica ricevuta',
+        text: 'From: '+val,
+        at: _4_sec_from_now,
+        icon: "res://icon.png",
+        led: "2196F3"
+    });
+/*  function onConfirm(buttonIndex) {
+      alert('You selected button ' + buttonIndex);
+  }*/
+  /*navigator.notification.confirm(
+      'Notifica ricevuta da '+val+', apri per visualizzare.', // message
+       onConfirm,            // callback to invoke with index of button pressed
+      'Notifica',           // title
+      ['Apri','Exit']     // buttonLabels
+  );*/
+  //navigator.notification.beep(1);
 }
 
 function validateLogin(email,pass){
@@ -431,10 +588,49 @@ function validateLogin(email,pass){
   return true;
 }
 
+function removeBlink(elem){
+  elem.classList.remove("blink");
+}
+
 function startSpinner() {
     $('.custom-spinner').show();
 }
 
 function stopSpinner() {
     $('.custom-spinner').hide();
+}
+
+/**
+* STORAGE FUNCTIONS
+*
+*/
+
+function checkStorage(){
+  if (typeof window.localStorage != undefined ) {
+    return true;
+  }else{
+    return false;
+  }
+}
+
+function setStorage(name, val){
+  if(checkStorage()){
+    localStorage.setItem(name, val);
+    return true;
+  }else{
+    return false;
+  }
+}
+
+function getStorage(name){
+  var val = localStorage.getItem(name);
+  if(val != undefined && val != null){
+    return val;
+  }else{
+    return false;
+  }
+}
+
+function deleteStorage(name){
+  localStorage.removeItem(name);
 }

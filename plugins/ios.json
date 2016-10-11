@@ -15,7 +15,20 @@
         },
         "cordova-plugin-console": {
             "PACKAGE_NAME": "com.lochiva.notifica"
+        },
+        "cordova-plugin-background-mode": {
+            "PACKAGE_NAME": "com.lochiva.notifica"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "com.lochiva.notifica"
+        },
+        "de.appplant.cordova.plugin.local-notification": {
+            "PACKAGE_NAME": "com.lochiva.notifica"
         }
     },
-    "dependent_plugins": {}
+    "dependent_plugins": {
+        "cordova-plugin-app-event": {
+            "PACKAGE_NAME": "com.lochiva.notifica"
+        }
+    }
 }
