@@ -21,12 +21,16 @@
  * Write the user groups badeges in the profile page
  */
 function writeUserGroups(user_details) {
-    $('#groups-list').html('');
-    $('#usergroups').html('<option data-role="none" value="" disabled selected>Scegli un gruppo</option>');
-    $.each(user_details.groups, function(index, element) {
-        $('#groups-list').append('<div class="chip">' + element + '</div>');
-        $('#usergroups').append('<option data-role="none" data-key="' + index + '" value="' + element + '">' + element + '</option>');
-    });
+    if(user_details.groups !== undefined && user_details.groups !== null){
+      $('#groups-list').html('');
+      $('#usergroups').html('<option data-role="none" value="" disabled selected>Scegli un gruppo</option>');
+      $.each(user_details.groups, function(index, element) {
+          $('#groups-list').append('<div class="chip">' + element + '</div>');
+          $('#usergroups').append('<option data-role="none" data-key="' + index + '" value="' + element + '">' + element + '</option>');
+      });
+    }else{
+      app.user.groups = '';
+    }
 
 }
 
@@ -40,6 +44,7 @@ function prependPersonalMessage(message, index) {
         to = ' <b>Group:</b> ' + message.group;
     } else {
         to = ' <b>To:</b> ' + message.to;
+        saveUserEmail(message.to);
     }
     $('#list-personal-messages').prepend('<li id="' + index + '" data-role="none">' +
         '<div class="collapsible-header"><i class="material-icons">email</i>' +
@@ -67,6 +72,16 @@ function prependMessage(message) {
         '<div class="collapsible-body"><p>' + message.text + '</p></div>' +
         '</li>');
 
+}
+
+function initializeAutoComplete(){
+  var data ={};
+  var users = getStorage('users-email');
+  if(users !== false){
+    users = JSON.parse(users);
+    data = users.data;
+  }
+  $('input.autocomplete').autocomplete({data: data});
 }
 /**
  * REMOVE BLINK

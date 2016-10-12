@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="iconfont/material-icons.css" media="all" />
     <link rel="stylesheet" type="text/css" href="css/materialize.min.css" media="screen,projection" />
     <link rel="stylesheet" type="text/css" href="css/index.css">
-    <title>Hello World</title>
+    <title>Notifica</title>
 </head>
 
 <body>
@@ -60,7 +60,7 @@
             <form class="col s12" id="login-form">
                 <div class="row">
                     <div class="input-field col s12 center">
-                        <img src="img/logo.png" alt="" class="circle responsive-img valign profile-image-login" width="100px">
+                        <img id="logo-img" src="img/logo.png" alt="" class="circle responsive-img valign profile-image-login" width="100px">
                         <p class="center login-form-text">NOTIFICA APP LOGIN</p>
                     </div>
                     </dvi>
@@ -222,6 +222,9 @@
             </ul>
             <ul id="list-personal-messages" class="collapsible" data-collapsible="expandable" data-role="none">
             </ul>
+            <div class="input-field col s12">
+                <a id="load-more" onClick="app.loadMore()" class="btn waves-effect waves-light light-blue darken-2 col s12" data-role="none">Carica Altro</a>
+            </div>
             </div>
             <div class="fixed-action-btn" style="bottom: 24px; right: 24px;">
                 <a href="#send-message"  data-transition="flip" class="btn-floating btn-large light-blue darken-3">
@@ -255,11 +258,11 @@
                 </div>-->
                 <div class="input-field col s6" data-role="none">
                     <label for="user-to-send" data-role="none">Email utente</label>
-                    <input id="user-to-send" name="user" type="email" data-role="none" data-error=".error-pass">
+                    <input id="user-to-send" name="user" type="email" data-role="none" class="autocomplete" data-error=".error-pass">
                     <div class="error-pass error"></div>
                 </div>
                 <div class="input-field col s12">
-                  <textarea id="message" class="materialize-textarea"></textarea>
+                  <textarea id="message" class="materialize-textarea" length="140"></textarea>
                   <label for="message">Messagio da inviare</label>
                 </div>
             </div>

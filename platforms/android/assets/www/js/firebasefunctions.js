@@ -25,6 +25,7 @@ function register(email, pass) {
     startSpinner();
     firebase.auth().createUserWithEmailAndPassword(email, pass).then(function() {
         app.firebaseConnected = true;
+        firebase.database().goOnline();
         Materialize.toast('Registrazione avvenuta con successo.', 3000, 'rounded');
         firebase.database().ref('user_details/').push({
             email: email,
@@ -66,6 +67,8 @@ function register(email, pass) {
 function login(email, pass) {
     startSpinner();
     firebase.auth().signInWithEmailAndPassword(email, pass).then(function() {
+        app.firebaseConnected = true;
+        firebase.database().goOnline();
         Materialize.toast('Login avvenuto con successo.', 3000, 'rounded');
         $(":mobile-pagecontainer").pagecontainer("change", '#home-page', {
             transition: "fade"
@@ -87,18 +90,25 @@ function login(email, pass) {
 /**
 * Read the user groups
 */
-function readUsergroups() {
+function readUsergroups(reload) {
     var ref = firebase.database().ref('/user_details/');
     ref.orderByChild('email').equalTo(firebase.auth().currentUser.email).once('value').then(function(snapshot) {
-        var user_details = snapshot.val();
-        var key = Object.keys(user_details)[0];
-        user_details = user_details[Object.keys(user_details)[0]];
-        app.user = user_details;
-        app.user.key = key;
-        //console.log(app.user);
-        writeUserGroups(user_details);
+        if(snapshot.val() !== null){
+          var user_details = snapshot.val();
+          var key = Object.keys(user_details)[0];
+          user_details = user_details[Object.keys(user_details)[0]];
+          app.user = user_details;
+          app.user.key = key;
+          //console.log(app.user);
+          writeUserGroups(user_details);
+        }
 
-        readMessages();
+        if(reload){
+          readMessagesOnce(10,5);
+        }else{
+          readMessages();
+        }
+
         startSpinner();
         setTimeout(function() {
             app.listMessages();
@@ -133,15 +143,17 @@ function readGroups() {
 /**
 * Read sent message of the user
 */
-function readPersonalMessages() {
+function readPersonalMessages(limit) {
     startSpinner();
     var ref = firebase.database().ref('/messages/');
 
-    ref.orderByChild('user').equalTo(firebase.auth().currentUser.email).limitToLast(20).once('value', function(snapshot) {
-        $('#list-personal-messages').html('');
-        $.each(snapshot.val(), function(index, element) {
-            prependPersonalMessage(element, index);
-        });
+    ref.orderByChild('user').equalTo(firebase.auth().currentUser.email).limitToLast(limit).once('value', function(snapshot) {
+      if(snapshot.val() !== null){
+          $('#list-personal-messages').html('');
+          $.each(snapshot.val(), function(index, element) {
+              prependPersonalMessage(element, index);
+          });
+      }
         stopSpinner();
     }, function(error) {
         stopSpinner();
@@ -172,25 +184,76 @@ function readMessages() {
         Materialize.toast('Errore connessione: ' + error, 5000);
         console.error(error);
     });
+    if(app.user.groups !== ''){
+      $.each(app.user.groups, function(index, element) {
+          //console.log(element);
+          var ref = firebase.database().ref('/messages/');
+          ref.orderByChild('group').equalTo(element).limitToLast(5).on('child_added', function(snapshot) {
+
+              var notifica = snapshot.val();
+              app.messages.push(notifica);
+              prependMessage(notifica);
+
+              if (app.inBackground) {
+                  app.alertNotification(notifica.user);
+              }
+
+          }, function(error) {
+              Materialize.toast('Errore connessione: ' + error, 5000);
+              console.error(error);
+          });
+      });
+    }
+
+}
+
+/**
+* Read messages Once
+*/
+function readMessagesOnce(limit1,limit2){
+  var ref = firebase.database().ref('/messages/');
+
+  ref.orderByChild('to').equalTo(firebase.auth().currentUser.email).limitToLast(limit1).once('value', function(snapshot) {
+      var notifica = snapshot.val();
+      if(notifica !== null){
+      $.each(snapshot.val(), function(index, element) {
+            app.messages.push(element);
+            prependMessage(element);
+            if (app.inBackground) {
+                app.alertNotification(element.user);
+            }
+      });
+    }
+
+
+  }, function(error) {
+      Materialize.toast('Errore connessione: ' + error, 5000);
+      console.error(error);
+  });
+  if(app.user.groups !== ''){
     $.each(app.user.groups, function(index, element) {
         //console.log(element);
         var ref = firebase.database().ref('/messages/');
-        ref.orderByChild('group').equalTo(element).limitToLast(5).on('child_added', function(snapshot) {
+        ref.orderByChild('group').equalTo(element).limitToLast(limit2).once('value', function(snapshot) {
+          var notifica = snapshot.val();
+          if(notifica !== null){
 
-            var notifica = snapshot.val();
-            app.messages.push(notifica);
-            prependMessage(notifica);
+              $.each(snapshot.val(), function(i, elem) {
+                    app.messages.push(elem);
+                    prependMessage(elem);
+                    if (app.inBackground) {
+                        app.alertNotification(elem.user);
+                    }
+              });
 
-            if (app.inBackground) {
-                app.alertNotification(notifica.user);
-            }
+          }
 
         }, function(error) {
             Materialize.toast('Errore connessione: ' + error, 5000);
             console.error(error);
         });
     });
-
+  }
 }
 
 /**

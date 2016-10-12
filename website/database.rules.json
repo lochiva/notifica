@@ -1,0 +1,16 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "user_details": {
+      ".indexOn": "email"
+    },
+    "messages": {
+      ".indexOn": [
+        "to",
+        "group",
+        "user"
+      ]
+    }
+  }
+}
