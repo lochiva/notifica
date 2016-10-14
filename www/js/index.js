@@ -64,27 +64,38 @@ var app = {
             title: 'Notifica ricevuta da ' + user + ', apri per visualizzare.',
         });
         var now = new Date().getTime(),
-            _4_sec_from_now = new Date(now + 4 * 1000);
+            _3_sec_from_now = new Date(now + 3 * 1000);
         cordova.plugins.notification.local.schedule({
             id: now,
             title: 'Notifica ricevuta',
             text: 'From: ' + user,
-            at: _4_sec_from_now,
+            at: _3_sec_from_now,
             icon: "res://icon.png",
             led: "2196F3"
         });
 
     },
 
+    checkPresentGroup: function(group) {
+      var find = false;
+      $.each(app.user.groups, function(index,element){
+        //console.log(group+" - "+element);
+        if(group == element){
+          find = true;
+        }
+      });
+      return find;
+    },
+
     listMessages: function() {
         $('#list-messages').html('');
-        list = app.messages;
+        list = app.messages;//console.log(list);
         list.sort(function(a, b) {
             // Order by timestamp
             return a.timestamp - b.timestamp;
         });
         $.each(list, function(index, element) {
-            prependMessage(element);
+            prependMessage(element,element.key);
 
         });
 
@@ -102,7 +113,7 @@ var app = {
 
             } else {
 
-                readPersonalMessages(20);
+                readPersonalMessages(10);
                 setTimeout(function() {
                     stopSpinner();
                 }, 1000);
@@ -116,19 +127,19 @@ var app = {
             startSpinner();
             if ($('#list-messages').is(":visible")) {
 
-                var limit = app.messages.length + 10;
+                /*var limit = app.messages.length + 10;
                 var limit2 = app.messages.length + 2;
-                app.messages = [];
-                readMessagesOnce(limit, limit2);
+                app.messages = [];*/
+                readMoreMessages(10, 5);
 
 
                 startSpinner();
                 setTimeout(function() {
                     app.listMessages();
                     stopSpinner();
-                }, 2000);
+                }, 1000);
             } else {
-                readPersonalMessages(60);
+                readMorePersonalMessages(10);
                 setTimeout(function() {
                     stopSpinner();
                 }, 1000);
@@ -141,15 +152,21 @@ var app = {
     },
 
     user: {
+        key: '',
         email: '',
         groups: {
 
         },
     },
+    lastPersonal:'',
     messages: [],
     inBackground: false,
     working: false,
     firebaseConnected: true,
+    lastMessagesTo: '',
+    lastMessagesGroups: [],
+    readMessages:[],
+    groupsListener: [],
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         /*var parentElement = document.getElementById(id);
@@ -251,7 +268,7 @@ $(document).ready(function() {
         startSpinner();
         $('#list-messages').hide();
         $('#list-personal-messages').show();
-        readPersonalMessages(20);
+        readPersonalMessages(10);
         $('#side-nav-button').sideNav('hide');
         stopSpinner();
     });
@@ -297,6 +314,12 @@ $(document).ready(function() {
         firebase.auth().signOut().then(function() {
             $('#list-messages').html('');
             $('#list-personal-messages').html('');
+            removeUserListener(app.user.email,10);
+            $.each(app.user.groups, function(index,element){
+              //console.log(group+" - "+element);
+              removeGroupListener(element,5);
+            });
+
             firebase.database().goOffline();
             stopSpinner();
         }, function(error) {
@@ -323,20 +346,13 @@ $(document).ready(function() {
         if (app.firebaseConnected) {
             startSpinner();
             var group = $('#add-group-user').val();
-            if (group !== undefined && group !== null) {
-                firebase.database().ref('/user_details/' + app.user.key + '/groups').push(group).then(function(snapshot) {
-                    app.messages = [];
-                    readUsergroups(true);
-
-                    Materialize.toast('Gruppo aggiunto.', 3000, 'rounded');
-                    stopSpinner();
-                }).catch(function(error) {
-
-                    Materialize.toast('Errore connessione: ' + error, 5000);
-                    stopSpinner();
-                });
+            if (group !== undefined && group !== null && !app.checkPresentGroup(group) ) {
+                addGroup(group);
+            }else{
+              stopSpinner();
             }
         } else {
+            stopSpinner();
             Materialize.toast('Connettività assente.', 4000);
         }
 
@@ -346,19 +362,12 @@ $(document).ready(function() {
             startSpinner();
             var key = $("#usergroups option:selected").attr('data-key');
             if (key !== undefined && key !== null) {
-                firebase.database().ref('/user_details/' + app.user.key + '/groups/' + key).remove().then(function(snapshot) {
-                    app.messages = [];
-                    readUsergroups(true);
-
-                    Materialize.toast('Gruppo elimninato.', 3000, 'rounded');
-                    stopSpinner();
-                }).catch(function(error) {
-
-                    Materialize.toast('Errore connessione: ' + error, 5000);
-                    stopSpinner();
-                });
+              deleteGroup(key);
+            }else{
+              stopSpinner();
             }
         } else {
+            stopSpinner();
             Materialize.toast('Connettività assente.', 4000);
         }
 
@@ -368,30 +377,12 @@ $(document).ready(function() {
             startSpinner();
             var group = $('#new-group').val();
             if (group !== undefined && group !== null && group !== '') {
-                firebase.database().ref('groups/' + group).set({
-                    name: group
-                }).then(function(snapshot) {
-                    firebase.database().ref('/user_details/' + app.user.key + '/groups').push(group).then(function(snapshot) {
-                        app.messages = [];
-                        readUsergroups(true);
-
-                        $('#new-group').val('');
-                        Materialize.toast('Gruppo creato ed aggiunto.', 3000, 'rounded');
-                        stopSpinner();
-                    }).catch(function(error) {
-                        Materialize.toast('Errore connessione: ' + error, 5000);
-                        stopSpinner();
-
-                    });
-                    readGroups();
-                }).catch(function(error) {
-
-                    Materialize.toast('Errore connessione: ' + error, 5000);
-                    stopSpinner();
-
-                });
+                createGroup(group);
+            }else{
+              stopSpinner();
             }
         } else {
+            stopSpinner();
             Materialize.toast('Connettività assente.', 4000);
         }
 
